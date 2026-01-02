@@ -1,4 +1,4 @@
-# Vibe-CLI 2.0 (Zero-Friction Vibe Coding Bootstrapper)
+# Vibe-CLI 2.0
 
 **Vibe-CLI** 是一个“项目启动器（Bootstrapper）”：把你的一句话需求，自动变成一个**可直接开始 Vibe Coding 的 IDE 工程**。
 
