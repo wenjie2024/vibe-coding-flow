@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Vibe-CLI generated test projects
+test_project*/
+example_project*/
+my_app/
+snake-game/
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Local Context (Optional: typically we might want to keep template/prompts but ignore specific run contexts if any)
+# .context/ 
+# For now, we assume .context inside the tool repo itself (if any) might be relevant docs or we leave it. 
+# But usually Vibe generates .context for *target* projects. 
+# If vibe-coding-flow implies it is *self-hosting* context, we keep it.
+
+# Logs
+*.log
+
+# Secrets / Configs
+config.yaml
+# Dev Utils
+inspect_sdk.py
