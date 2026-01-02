@@ -86,7 +86,8 @@ def setup():
 @app.command()
 def create(
     project_path: str = typer.Argument(..., help="Path to the new project (e.g., 'my-app' or '../my-app')"),
-    prompt: str = typer.Option(..., help="Initial vague requirement for the project"),
+    prompt: str = typer.Option(None, help="一句话需求描述"),
+    promptfile: str = typer.Option(None, "--promptfile", help="从文件读取详细需求"),
     interactive: bool = typer.Option(False, "--interactive", "-i", help="启用交互模式以手动完善需求"),
 ):
     """
@@ -95,6 +96,42 @@ def create(
     # Resolve path and name
     project_dir = Path(project_path).resolve()
     project_name = project_dir.name
+    
+    # --- Input Validation & Resolution ---
+    user_request = None
+    
+    if promptfile:
+        promptfile_path = Path(promptfile)
+        if promptfile_path.exists():
+            # Read from file
+            user_request = promptfile_path.read_text(encoding="utf-8")
+            console.print(f"[dim]📄 已从文件读取需求: {promptfile}[/dim]")
+        else:
+            # Auto-generate template
+            promptfile_path.parent.mkdir(parents=True, exist_ok=True)
+            template_content = read_template("REQUIREMENTS_TEMPLATE.md", TEMPLATES_DIR)
+            with open(promptfile_path, "w", encoding="utf-8") as f:
+                f.write(template_content)
+            console.print(Panel(
+                f"[bold yellow]📝 已生成需求模板：{promptfile}[/bold yellow]\n\n"
+                f"请填写模板后重新运行以下命令：\n"
+                f"[bold cyan]python vibe.py create {project_path} --promptfile {promptfile}[/bold cyan]",
+                title="请先填写需求模板"
+            ))
+            raise typer.Exit(code=0)
+    
+    if prompt:
+        if user_request:
+            # Both provided: append prompt as summary
+            user_request = f"# 摘要\n{prompt}\n\n---\n\n{user_request}"
+        else:
+            user_request = prompt
+    
+    if not user_request:
+        console.print("[bold red]错误：[/bold red]请提供 --prompt 或 --promptfile 参数。")
+        console.print("[dim]示例：python vibe.py create my-project --prompt \"你的想法\"[/dim]")
+        console.print("[dim]或者：python vibe.py create my-project --promptfile requirements.md[/dim]")
+        raise typer.Exit(code=1)
     
     console.print(Panel.fit(f"[bold blue]Welcome to Vibe-CLI 2.0[/bold blue]\nInitializing project: [green]{project_name}[/green]\nLocation: [dim]{project_dir}[/dim]"))
 
@@ -105,7 +142,7 @@ def create(
     # --- Step 1: Analyst Agent ---
     console.print("\n[bold cyan]🤖 需求分析师 (Analyst):[/bold cyan] 正在分析需求...")
     analyst_template = read_template("analyst.md", PROMPTS_DIR)
-    analyst_prompt = analyst_template.replace("{{user_request}}", prompt)
+    analyst_prompt = analyst_template.replace("{{user_request}}", user_request)
     
     analyst_response = call_llm(analyst_prompt, "需求分析师")
     product_context = extract_file_content(analyst_response, "productContext.md")

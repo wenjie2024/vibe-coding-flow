@@ -50,3 +50,9 @@ snake-game/
 config.yaml
 # Dev Utils
 inspect_sdk.py
+
+# Doc (internal drafts)
+doc/
+
+# Git rewrite utils
+rewrite.mailmap
