@@ -1,6 +1,6 @@
 # Vibe-CLI 2.0
 
-**Vibe-CLI** 是一个“项目启动器（Bootstrapper）”：把你的一句话需求，自动变成一个**可直接开始 Vibe Coding 的 IDE 工程**。
+**Vibe-CLI** 是一个“项目启动器（Bootstrapper）”：把你的需求（一句话或详细文档），自动变成一个**可直接开始 Vibe Coding 的 IDE 工程**。
 
 它解决的不是“写代码”，而是 **Day 0 环境与上下文的摩擦**：当你第一次用 Cursor / VSCode / Antigravity 打开项目时，AI Agent 看到的是一个已经准备好的工程——**环境可复现、规则可执行、计划可跟随**。
 
@@ -40,11 +40,20 @@ python -m my_llm_sdk.cli init
 
 ### 2) 创建项目（生成“可 Vibe Coding 的工程骨架”）
 
+**方式一：一句话需求（适合简单项目）**
 ```bash
 python vibe.py create <PROJECT_PATH> --prompt "你的想法" --interactive
 ```
 
-* `--interactive (-i)`：强烈推荐。用于回答“待确认事项”，避免 AI 误设范围。
+**方式 B：详细需求模板**
+```bash
+python vibe.py create my-project --promptfile requirements.md -i
+```
+> 如果 `requirements.md` 不存在，会自动生成包含 15 个章节的需求模板。建议配合 `-i` 使用，即使文档再全，最后的人工确认也是“不翻车”的关键。
+
+* `--interactive (-i)`：建议默认开启，用于确认需求和技术栈。
+* `python vibe.py plan my-project`：创建后运行，生成第一阶段计划。即使使用了详细模板，交互模式仍能让你在 AI 生成 PRD 后进行最后的锁定与微调。
+* `--promptfile`：支持结构化需求输入，包含目标、用户故事、验收标准等深度上下文。支持与 `-i` 模式叠加使用。
 
 ### 3) 一键把环境跑到全绿 ✅（进入项目目录）
 
@@ -63,7 +72,11 @@ python preflight.py
 ### Step 1. Create（生成上下文 + 环境骨架）
 
 ```bash
+# 方式 A：直接输入
 python vibe.py create <PROJECT_PATH> --prompt "你的想法" --interactive
+
+# 方式 B：使用需求模板（推荐复杂项目）
+python vibe.py create <PROJECT_PATH> --promptfile requirements.md -i
 ```
 
 ### Step 2. Plan（生成 Phase 1 的执行计划）
@@ -77,7 +90,7 @@ python vibe.py plan <PROJECT_PATH>
 进入项目目录后，按 `SETUP_GUIDE_ZH.md` 完成：
 
 1. 创建 Conda 环境
-2. 安装 SDK（`pip install git+https://github.com/NoneSeniorEngineer/my-llm-sdk.git`）
+2. 安装 SDK（`pip install git+https://github.com/wenjie2024/my-llm-sdk.git`）
 3. 初始化 SDK（如果尚未配置过）
 4. 运行自检：`python preflight.py` 全绿 ✅
 
