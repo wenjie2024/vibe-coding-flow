@@ -6,6 +6,7 @@ Read the provided `productContext.md` and `systemPatterns.md`.
 **CRITICAL**: You must output the entire content in **Simplified Chinese**.
 
 Generate an `activeContext.md` that outlines the immediate next steps and a roadmap for the project.
+**NOTE**: The project structure includes a `plan/` directory intended for detailed phased implementation plans (e.g., `plan_phase1.md`). Your `activeContext.md` serves as the high-level roadmap and current status tracker.
 
 # Output Format
 You must output the content for `activeContext.md`.
