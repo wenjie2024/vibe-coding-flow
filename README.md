@@ -32,7 +32,7 @@ Vibe-CLI 会为每个新项目生成四样“必需品”，让你**不再手动
 
 在开始使用 Vibe-CLI 之前，建议先配置 Antigravity 的全局规则文件 (`GEMINI.md`)。这能确保所有 Antigravity 会话都遵循您的基础偏好（如语言、角色设定等）。
 
-请将本仓库根目录下的 `GEMINI.md` (或 `GEMINI_CN.md` 仅供参考) 复制到您用户主目录下的 `.gemini` 文件夹中：
+请将本仓库 `templates/` 目录下的 `GEMINI.md` (或 `GEMINI_CN.md` 仅供参考) 复制到您用户主目录下的 `.gemini` 文件夹中：
 
 *   **Windows**:
     *   `%USERPROFILE%\.gemini\GEMINI.md`
