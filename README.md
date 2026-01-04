@@ -28,7 +28,22 @@ Vibe-CLI 会为每个新项目生成四样“必需品”，让你**不再手动
 
 > 你只需要做三件事：安装依赖 → 创建项目 → 按指南 setup + 自检全绿
 
-### 1) 安装
+### 1) 全局配置 (Global Rules) - [Antigravity 用户必读]
+
+在开始使用 Vibe-CLI 之前，建议先配置 Antigravity 的全局规则文件 (`GEMINI.md`)。这能确保所有 Antigravity 会话都遵循您的基础偏好（如语言、角色设定等）。
+
+请将本仓库根目录下的 `GEMINI.md` (或 `GEMINI_CN.md` 仅供参考) 复制到您用户主目录下的 `.gemini` 文件夹中：
+
+*   **Windows**:
+    *   `%USERPROFILE%\.gemini\GEMINI.md`
+    *   (例如: `C:\Users\YourName\.gemini\GEMINI.md`)
+*   **macOS / Linux**:
+    *   `~/.gemini/GEMINI.md`
+    *   (例如: `/Users/YourName/.gemini/GEMINI.md`)
+
+> **Note**: 这是 Antigravity 的 [Global Rules](https://antigravity.google/docs/rules-workflows?utm_source=chatgpt.com) 配置，对所有项目生效。Vibe-CLI 生成的 `.agent/rules` 是项目级规则，优先级更高。
+
+### 2) 安装
 
 ```bash
 # 在 vibe-coding-flow 根目录
