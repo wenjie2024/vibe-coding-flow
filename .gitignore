@@ -58,3 +58,7 @@ doc/
 rewrite.mailmap
 
 docs/
+
+# Local Dev / Testing
+requirements.md
+test_prj/
