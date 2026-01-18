@@ -73,7 +73,25 @@ class ClaudeAdapter(BaseAdapter):
         }
         plan.files[".claude/mcp.json"] = json.dumps(mcp_config, indent=2)
         
-        # 4. .gitignore
+        
+        # 4. Skills (Step C Implementation)
+        skills_summary = []
+        for script_name, content in rule_bundle.scripts.items():
+             # For Claude, we place scripts in .claude/skills/ to keep root clean
+             # They can be run via `python .claude/skills/xxx.py`
+             skill_path = f".claude/skills/{script_name}"
+             plan.files[skill_path] = content
+             skills_summary.append(f"- **{script_name}**: (Located at `{skill_path}`)")
+
+        # Append Skills to CLAUDE.md if any
+        if skills_summary:
+            claude_content.append("")
+            claude_content.append("## Skills / Scripts")
+            claude_content.extend(skills_summary)
+            # Re-join content to update file
+            plan.files["CLAUDE.md"] = "\n".join(claude_content)
+
+        # 5. .gitignore
         # Ensure local config is ignored
         plan.files[".gitignore"] = (
             "# Claude Code Local Override\n"
