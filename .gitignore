@@ -48,6 +48,7 @@ snake-game/
 
 # Secrets / Configs
 config.yaml
+llm.project.yaml
 # Dev Utils
 inspect_sdk.py
 
