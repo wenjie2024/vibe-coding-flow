@@ -184,12 +184,43 @@ A: 它确保 AI 在 IDE 里不会“随手乱来”，例如禁止直接调用 O
 
 ---
 
+## 🔌 多 IDE 支持 (Multi-IDE Support)
+
+Vibe-CLI 2.0 引入了**适配器架构 (Adapter Architecture)**，支持为不同的 AI 编程工具生成原生的配置和规则。
+
+### 支持的 IDE
+
+| IDE / Tool | 生成配置 | 核心机制 |
+| :--- | :--- | :--- |
+| **Antigravity** (Default) | `.agent/rules/`, `.agent/skills/` | 标准规则 + 技能脚本映射 |
+| **Claude Code** | `CLAUDE.md`, `.claude/settings.json` | 单一规则文件 + 权限自动合并 |
+| **Cursor** | `.cursor/rules/*.mdc` | 现代 MDC 格式规则包 (亦支持旧版 `.cursorrules`) |
+
+### 使用方法
+
+在创建项目时指定 `--ide` 参数：
+
+```bash
+# 生成 Cursor 项目 (推荐: 生成 .mdc 规则)
+python -m vibe create my-project --ide cursor
+
+# 生成 Claude Code 项目 (生成 CLAUDE.md)
+python -m vibe create my-project --ide claude
+
+# 生成 Antigravity 项目 (默认)
+python -m vibe create my-project --ide antigravity
+```
+
+> **Note**: 使用 `--ide all` 可同时生成所有 IDE 的配置（适合团队协作场景）。
+
+---
+
 ## 📅 Roadmap
 
-### Planned Features (Deferred)
-*   **Multi-IDE Support**: In future versions, Vibe-CLI plans to support generating rules for other IDEs such as Claude Code (`CLAUDE.md`) and Cursor (`.cursorrules`). Currently, it default to Antigravity (`.agent/rules`).
-    *   Goal: Enable seamless "Vibe Context" injection into any AI coding tool.
-    *   Status: Infrastructure ready (Adapter Pattern), CLI integration pending.
+*   [x] **Core Scaffolding**: 完整的上下文生成 (Product/System/Active Context).
+*   [x] **Preflight Checks**: 环境自检脚本.
+*   [x] **Multi-IDE Adapters**: 支持 Antigravity, Claude, Cursor.
+*   [ ] **Deep Research**: 集成深度调研代理 (Planning 阶段).
 
 ---
 
