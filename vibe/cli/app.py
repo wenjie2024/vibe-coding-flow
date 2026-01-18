@@ -13,6 +13,12 @@ from vibe.config.paths import TEMPLATES_DIR, PROMPTS_DIR, RULES_DIR
 from vibe.config.settings import Settings
 from vibe.utils.files import read_template
 
+# Adapter Imports
+import vibe.core.adapters.antigravity
+import vibe.core.adapters.claude
+from vibe.core.scaffolding import build_rule_bundle, apply_write_plan
+from vibe.core.adapter_registry import AdapterRegistry
+
 app = typer.Typer(help="Vibe-CLI: Intelligent Project Bootstrapper")
 
 # Try to import my_llm_sdk, handle failure gracefully
@@ -38,6 +44,12 @@ except ImportError as e1:
         sys.exit(1)
 
 def call_llm(prompt_text: str, step_name: str) -> str:
+    if os.environ.get("VIBE_MOCK_LLM") == "1":
+        console.print(f"[magenta]🔮 Mocking LLM response for {step_name}[/magenta]")
+        return "|||FILE: productContext.md|||# Mock Goal\nGoal\n|||END_FILE|||\n" \
+               "|||FILE: systemPatterns.md|||# Mock Architecture\nArch\n|||END_FILE|||\n" \
+               "|||FILE: activeContext.md|||# Mock Task\nTask\n|||END_FILE|||"
+
     console.print(f"[yellow]⏳ {step_name} is thinking...[/yellow]")
     user_conf, proj_conf = Settings.resolve_config_paths()
     try:
@@ -46,6 +58,8 @@ def call_llm(prompt_text: str, step_name: str) -> str:
         return response
     except Exception as e:
         console.print(f"[bold red]❌ LLM Error:[/bold red] {e}")
+        # For dev benefit, if mock allowed but not set, strict fail. 
+        # But if error happens, maybe fallback to mock? No, that's confusing.
         sys.exit(1)
 
 def extract_file_content(response: str, filename: str) -> str:
@@ -70,6 +84,10 @@ def create(
     promptfile: str = typer.Option(None, "--promptfile", help="从文件读取详细需求"),
     interactive: bool = typer.Option(False, "--interactive", "-i", help="启用交互模式以手动完善需求"),
     no_plan: bool = typer.Option(False, "--no-plan", help="跳过自动生成实施计划"),
+    ide: str = typer.Option("antigravity", help="Target IDE: antigravity, claude, cursor"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview changes without writing"),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing files"),
+    cursor_legacy: bool = typer.Option(False, "--cursor-legacy", help="Generate legacy .cursorrules (Cursor only)"),
 ):
     """
     Starts a new AI-Ready project from a prompt.
@@ -222,148 +240,75 @@ def create(
     else:
         console.print("[green]✅ 技术栈方案已确认。[/green]")
 
-    # --- Step 3: Injector (DevOps) ---
-    console.print("\n[bold orange3]🤖 运维专家 (Injector):[/bold orange3] 正在准备开发环境...")
+    # --- Step 3: Scaffolding Phase 1 (Core Context) ---
+    console.print(f"\n[bold white]🔨 Initializing Core Context for {project_name}...[/bold white]")
     
-    # Define rules content
-    # 00a Runtime Check
-    rule_00a_content = read_template("00a_project_environment.md", RULES_DIR)
-    # 00b LLM Rules
-    rule_00b_content = read_template("00b_llm_integration.md", RULES_DIR)
-
-    # 01 Workflow
-    rule_01_content = read_template("01_workflow_plan_first.md", RULES_DIR)
-    
-    # 02 Stack (Dynamic Selection)
-    rule_02_template_name = "02_stack_python_fastapi.md"  # Default
-    
-    # Simple heuristic to detect stack from systemPatterns
-    sys_patterns_lower = system_patterns.lower()
-    
-    if "django" in sys_patterns_lower:
-        rule_02_template_name = "02_stack_python_django.md"
-    elif "node" in sys_patterns_lower or "express" in sys_patterns_lower:
-        rule_02_template_name = "02_stack_nodejs_express.md"
-    elif "react" in sys_patterns_lower or "vite" in sys_patterns_lower:
-        rule_02_template_name = "02_stack_react_vite.md"
-    elif "go" in sys_patterns_lower or "gin" in sys_patterns_lower:
-        rule_02_template_name = "02_stack_go_gin.md"
-    elif "telegram" in sys_patterns_lower or "bot" in sys_patterns_lower:
-        rule_02_template_name = "02_stack_telegram_bot.md"
-    elif "postgres" in sys_patterns_lower:
-        rule_02_template_name = "02_stack_postgresql.md"
-    # Add more heuristics as needed
-    
-    try:
-        rule_02_content = read_template(rule_02_template_name, RULES_DIR)
-    except SystemExit:
-        # Fallback if specific template not found
-        console.print(f"[yellow]⚠️  Template {rule_02_template_name} not found, using default FastAPI.[/yellow]")
-        rule_02_template_name = "02_stack_python_fastapi.md"
-        rule_02_content = read_template(rule_02_template_name, RULES_DIR)
-
-    # 03 Output
-    rule_03_content = read_template("03_output_format.md", RULES_DIR)
-    
-    # Setup Guide
     setup_guide_content = read_template("SETUP_GUIDE.md", TEMPLATES_DIR)
     setup_guide_zh_content = read_template("SETUP_GUIDE_ZH.md", TEMPLATES_DIR)
     preflight_content = read_template("preflight.py", TEMPLATES_DIR)
+
+    if not dry_run:
+        os.makedirs(project_dir, exist_ok=True)
+        context_dir = project_dir / ".context"
+        os.makedirs(context_dir, exist_ok=True)
+
+        # Write productContext
+        with open(context_dir / "productContext.md", "w", encoding="utf-8") as f:
+            f.write(product_context)
+
+        # Write systemPatterns (with Critical Rules injection)
+        critical_rules = "\n## 🛡️ Vibe Critical Rules\n1. Follow the workflow in `01_workflow.md`.\n2. Respect IDE-specific rules.\n"
+        system_patterns_final = system_patterns + critical_rules
+        
+        with open(context_dir / "systemPatterns.md", "w", encoding="utf-8") as f:
+            f.write(system_patterns_final)
+            
+        # Write project_env.yaml
+        with open(context_dir / "project_env.yaml", "w", encoding="utf-8") as f:
+            f.write(f"conda_env: {project_name}\n")
+            
+        # Write setup guides
+        with open(project_dir / "SETUP_GUIDE.md", "w", encoding="utf-8") as f:
+            f.write(setup_guide_content.replace("{{project_name}}", project_name))
+            
+        with open(project_dir / "SETUP_GUIDE_ZH.md", "w", encoding="utf-8") as f:
+            f.write(setup_guide_zh_content.replace("{{project_name}}", project_name))
+            
+        with open(project_dir / "preflight.py", "w", encoding="utf-8") as f:
+            f.write(preflight_content)
+    else:
+        console.print("[yellow]DRY RUN: Skipping Core Context creation[/yellow]")
+
+    # --- Step 4: Scaffolding Phase 2 (IDE Projection) ---
+    console.print(f"[bold white]🎨 Projecting configuration for IDE: {ide}...[/bold white]")
     
-    console.print(f"[dim]ℹ️  已选择规则集: {rule_02_template_name}[/dim]")
-
-    # --- Step 4: Scaffolding ---
-    console.print(f"\n[bold white]🔨 正在初始化项目 {project_name}...[/bold white]")
+    # 1. Build Bundle
+    context_data = {
+        "product_context": product_context,
+        "system_patterns": system_patterns,
+    }
     
-    os.makedirs(project_dir, exist_ok=True)
-    context_dir = project_dir / ".context"
-    os.makedirs(context_dir, exist_ok=True)
-    
-    # New: Antigravity Rules Directory
-    rules_dir = project_dir / ".agent" / "rules"
-    os.makedirs(rules_dir, exist_ok=True)
-    
-    # Write artifacts
-    with open(context_dir / "productContext.md", "w", encoding="utf-8") as f:
-        f.write(product_context)
+    try:
+        rule_bundle = build_rule_bundle(context_data)
         
-    # --- Step 4.5: Inject Critical Rules into systemPatterns.md ---
-    # To force the Agent to respect Rule 00a, we append it directly to the System Prompt level context.
-    critical_rules_section = f"""
-## 🛡️ CRITICAL AGENT RULES (MUST FOLLOW)
-1. **Mandatory Execution Pattern**: ALL commands must be run via `conda run -n {project_name} ...`.
-   - ❌ FORBIDDEN: `python script.py` (Do not assume active env)
-   - ✅ REQUIRED: `conda run -n {project_name} python script.py`
-2. **Rule Consistency**: See `.agent/rules/00a_project_environment.md` for the authoritative source.
-3. **LLM Usage**: MUST use `my-llm-sdk` as per `.agent/rules/00b_llm_integration.md`.
-"""
-    system_patterns += critical_rules_section
-
-    with open(context_dir / "systemPatterns.md", "w", encoding="utf-8") as f:
-        f.write(system_patterns)
+        # 2. Get Adapter
+        adapter = AdapterRegistry.get(ide)
         
-    # Generate .context/project_env.yaml
-    project_env_content = f"conda_env: {project_name}\n"
-    with open(context_dir / "project_env.yaml", "w", encoding="utf-8") as f:
-        f.write(project_env_content)
+        # 3. Project
+        write_plan = adapter.project(rule_bundle)
         
-    # Generate SETUP_GUIDE.md (EN)
-    setup_guide_final = setup_guide_content.replace("{{project_name}}", project_name)
-    with open(project_dir / "SETUP_GUIDE.md", "w", encoding="utf-8") as f:
-        f.write(setup_guide_final)
-
-    # Generate SETUP_GUIDE_ZH.md (CN)
-    setup_guide_zh_final = setup_guide_zh_content.replace("{{project_name}}", project_name)
-    with open(project_dir / "SETUP_GUIDE_ZH.md", "w", encoding="utf-8") as f:
-        f.write(setup_guide_zh_final)
+        # 4. Apply
+        apply_write_plan(write_plan, project_dir, mode="force" if force else "safe", dry_run=dry_run)
         
-    # Generate preflight.py
-    with open(project_dir / "preflight.py", "w", encoding="utf-8") as f:
-        f.write(preflight_content)
+        # Pass cursor_legacy param if applicable (To be implemented in Step C)
+        # currently project() signature doesn't support extra args, 
+        # we might need to pass it via constructor or context.
+        # For now, simplistic implementation for Antigravity (Step A).
         
-    # Generate 00_project_context.md (Summary)
-    console.print("[dim]正在生成 00_project_context.md (项目摘要)...[/dim]")
-    # In a real implementation, this might use an LLM to summarize if too large.
-    # For POC, we synthesize a structured summary.
-    project_context_summary = f"""# Rule 00: Project Context (Summary)
+    except Exception as e:
+        console.print(f"[bold red]Adapter Error (Did you install the right adapter?):[/bold red] {e}")
+        # raise typer.Exit(code=1) # Don't exit yet, let dry run finish or debug
 
-## 1. Goal
-(Extracted from productContext.md)
-This project aims to build an AI-native application as defined in the product context.
-
-## 2. Architecture
-(Extracted from systemPatterns.md)
-Please refer to the detailed architecture in `.context/systemPatterns.md`.
-
-## 3. System Instructions
-- **MUST READ**: `.context/productContext.md` for requirements.
-- **MUST READ**: `.context/systemPatterns.md` for implementation details.
-- **MUST READ**: `.context/activeContext.md` (if exists) for current tasks.
-
-## 4. Constraints
-- Code must be strict and production-ready.
-- Follow the workflow in `01_workflow_plan_first.md`.
-"""
-    # Simply writing the synthesis for now. In production, we'd read the actual content to summarize.
-    
-    with open(rules_dir / "00_project_context.md", "w", encoding="utf-8") as f:
-        f.write(project_context_summary)
-
-    # Write Fixed Rules
-    with open(rules_dir / "00a_project_environment.md", "w", encoding="utf-8") as f:
-        f.write(rule_00a_content)
-
-    with open(rules_dir / "00b_llm_integration.md", "w", encoding="utf-8") as f:
-        f.write(rule_00b_content)
-
-    with open(rules_dir / "01_workflow_plan_first.md", "w", encoding="utf-8") as f:
-        f.write(rule_01_content)
-        
-    with open(rules_dir / rule_02_template_name, "w", encoding="utf-8") as f:
-        f.write(rule_02_content)
-
-    with open(rules_dir / "03_output_format.md", "w", encoding="utf-8") as f:
-        f.write(rule_03_content)
         
 
     # Write README

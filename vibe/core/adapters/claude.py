@@ -1,0 +1,84 @@
+import json
+from vibe.core.adapter_interface import BaseAdapter, RuleBundle, WritePlan
+from vibe.core.adapter_registry import AdapterRegistry
+
+@AdapterRegistry.register("claude")
+class ClaudeAdapter(BaseAdapter):
+    """
+    Adapter for Anthropic's Claude Code.
+    Aggregates rules into CLAUDE.md and manages .claude/ configuration.
+    """
+    
+    def project(self, rule_bundle: RuleBundle) -> WritePlan:
+        plan = WritePlan()
+        
+        # 1. Aggregate CLAUDE.md
+        claude_content = [
+            "# CLAUDE.md - Project Rules",
+            "",
+            "## Core Context (MUST READ)",
+            "- **Active Context**: Read `.context/activeContext.md` to understand current task status.",
+            "- **Product Context**: Read `.context/productContext.md` for requirements.",
+            "- **System Architecture**: Read `.context/systemPatterns.md` for tech stack.",
+            "",
+            "## Workflow",
+            rule_bundle.rules.get("01_workflow.md", ""),
+            "",
+            "## Tech Stack",
+            rule_bundle.rules.get("02_stack.md", ""), # Normalized key
+            "",
+            "## Output Format",
+            rule_bundle.rules.get("03_output_format.md", ""),
+            "",
+            "## Environment & LLM",
+            rule_bundle.rules.get("00a_project_environment.md", ""),
+            rule_bundle.rules.get("00b_llm_integration.md", ""),
+        ]
+        
+        # Clean up empty lines or None
+        claude_content = [line for line in claude_content if line is not None]
+        plan.files["CLAUDE.md"] = "\n".join(claude_content)
+        
+        # 2. Settings (Shared)
+        # Represents the Vibe-managed baseline permissions
+        settings = {
+            "permissions": {
+                "allow": [
+                    "bash", 
+                    "git status", 
+                    "git diff", 
+                    "git log", 
+                    "ls", 
+                    "cat", 
+                    "grep", 
+                    "find"
+                ]
+            }
+        }
+        plan.files[".claude/settings.json"] = json.dumps(settings, indent=2)
+        
+        # 3. MCP Config
+        # Standard toolset
+        mcp_config = {
+            "mcpServers": {
+                "filesystem": { 
+                    "command": "npx", 
+                    "args": ["-y", "@modelcontextprotocol/server-filesystem", "."] 
+                },
+                "git": { 
+                    "command": "npx", 
+                    "args": ["-y", "@modelcontextprotocol/server-git", "."] 
+                }
+            }
+        }
+        plan.files[".claude/mcp.json"] = json.dumps(mcp_config, indent=2)
+        
+        # 4. .gitignore
+        # Ensure local config is ignored
+        plan.files[".gitignore"] = (
+            "# Claude Code Local Override\n"
+            ".claude/settings.local.json\n"
+            ".claude/mcp.local.json\n"
+        )
+        
+        return plan
