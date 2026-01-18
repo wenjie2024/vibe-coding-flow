@@ -198,20 +198,20 @@ Vibe-CLI 2.0 引入了**适配器架构 (Adapter Architecture)**，支持为不�
 
 ### 使用方法
 
-在创建项目时指定 `--ide` 参数：
+`--ide` 参数可以与现有的 `--prompt`、`--interactive` 等参数**任意组合**。
 
 ```bash
-# 生成 Cursor 项目 (推荐: 生成 .mdc 规则)
-python -m vibe create my-project --ide cursor
+# 场景 1：标准交互式创建 (生成 Cursor 规则)
+python -m vibe create my-project --prompt "写一个贪吃蛇游戏" --interactive --ide cursor
 
-# 生成 Claude Code 项目 (生成 CLAUDE.md)
-python -m vibe create my-project --ide claude
+# 场景 2：使用需求文档 + Claude Code
+python -m vibe create my-project --promptfile requirements.md --ide claude
 
-# 生成 Antigravity 项目 (默认)
+# 场景 3：仅生成配置 (默认 Antigravity)
 python -m vibe create my-project --ide antigravity
 ```
 
-> **Note**: 使用 `--ide all` 可同时生成所有 IDE 的配置（适合团队协作场景）。
+> **Note**: 也就是在原有的命令基础上，加上 `--ide <tool>` 即可。不加则默认为 `antigravity`。
 
 ---
 
