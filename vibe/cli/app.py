@@ -100,9 +100,10 @@ def init(
         gemini_root = home / ".gemini"
         gemini_root.mkdir(exist_ok=True)
         
-        # 1. GEMINI.md
+        # 1. GEMINI.md (Defaulting to English/Standard)
         target_gemini = gemini_root / "GEMINI.md"
-        source_gemini = global_assets / "GEMINI_CN.md"
+        # Using GEMINI_old.md as the base English/Standard version if GEMINI.md doesn't exist
+        source_gemini = global_assets / "GEMINI_old.md" # Assuming this is English/Standard
         
         if target_gemini.exists() and not force:
             should_overwrite = typer.confirm(f"Found existing {target_gemini}. Overwrite?", default=False)
@@ -110,8 +111,15 @@ def init(
             should_overwrite = True
             
         if should_overwrite:
-            shutil.copy(source_gemini, target_gemini)
-            console.print(f"[green]✅ Copied Global Rules to: {target_gemini}[/green]")
+            if source_gemini.exists():
+                shutil.copy(source_gemini, target_gemini)
+                console.print(f"[green]✅ Copied Global Rules (English) to: {target_gemini}[/green]")
+            else:
+                 console.print(f"[red]❌ Source {source_gemini} not found.[/red]")
+
+            # Tip for Chinese User
+            console.print(f"[dim]💡 Tip: If you prefer the Chinese version, manually copy:[/dim]")
+            console.print(f"[dim]   cp {global_assets / 'GEMINI_CN.md'} {target_gemini}[/dim]")
         else:
             console.print(f"[dim]Skipped {target_gemini}[/dim]")
 
