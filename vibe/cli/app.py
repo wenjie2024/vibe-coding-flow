@@ -4,6 +4,7 @@ import typer
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
 from rich.panel import Panel
 from rich.prompt import Prompt
@@ -102,8 +103,7 @@ def init(
         
         # 1. GEMINI.md (Defaulting to English/Standard)
         target_gemini = gemini_root / "GEMINI.md"
-        # Using GEMINI_old.md as the base English/Standard version if GEMINI.md doesn't exist
-        source_gemini = global_assets / "GEMINI_old.md" # Assuming this is English/Standard
+        source_gemini = global_assets / "GEMINI_EN.md"
         
         if target_gemini.exists() and not force:
             should_overwrite = typer.confirm(f"Found existing {target_gemini}. Overwrite?", default=False)
@@ -111,10 +111,17 @@ def init(
             should_overwrite = True
             
         if should_overwrite:
+            if target_gemini.exists():
+                # Perform backup before overwrite
+                backup_gemini = target_gemini.with_suffix(f".bak.{int(time.time())}")
+                shutil.copy(target_gemini, backup_gemini)
+                console.print(f"[dim]📜 Existing config backed up to: {backup_gemini}[/dim]")
+            
             if source_gemini.exists():
                 shutil.copy(source_gemini, target_gemini)
                 console.print(f"[green]✅ Copied Global Rules (English) to: {target_gemini}[/green]")
             else:
+                 # Fallback to older naming if needed, but here we expect GEMINI_EN.md
                  console.print(f"[red]❌ Source {source_gemini} not found.[/red]")
 
             # Tip for Chinese User
@@ -133,6 +140,12 @@ def init(
             should_overwrite_skills = True
             
         if should_overwrite_skills:
+            if target_skills.exists():
+                # Perform backup before overwrite/merge
+                backup_skills = target_skills.parent / f"skills.bak.{int(time.time())}"
+                shutil.copytree(target_skills, backup_skills)
+                console.print(f"[dim]📜 Existing skills backed up to: {backup_skills}[/dim]")
+            
             shutil.copytree(source_skills, target_skills, dirs_exist_ok=True)
             console.print(f"[green]✅ Installed Global Skills to: {target_skills}[/green]")
         else:
@@ -143,7 +156,10 @@ def init(
         console.print("\n[bold yellow]ℹ️  Claude Code Setup[/bold yellow]")
         console.print("Claude Code uses project-level configuration mostly.")
         console.print(f"Global templates are available at: [bold]{global_assets}[/bold]")
-        console.print("You can copy `CLAUDE_zh.md` to your project roots as a base.")
+        console.print(f"Recommended versions:")
+        console.print(f"  • Chinese: [dim]{global_assets / 'CLAUDE_CN.md'}[/dim]")
+        console.print(f"  • English: [dim]{global_assets / 'CLAUDE_EN.md'}[/dim]")
+        console.print("You can copy these files to your project roots as `CLAUDE.md`.")
 
 def _check_global_config(ide: str):
     """Checks if global config is set up for the chosen IDE."""
