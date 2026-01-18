@@ -7,3 +7,4 @@ PACKAGE_ROOT = Path(__file__).parent.parent
 TEMPLATES_DIR = PACKAGE_ROOT / "templates"
 PROMPTS_DIR = TEMPLATES_DIR / "prompts"
 RULES_DIR = TEMPLATES_DIR / "rules"
+SCRIPTS_DIR = TEMPLATES_DIR / "scripts"

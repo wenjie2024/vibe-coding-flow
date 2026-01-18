@@ -16,6 +16,7 @@ from vibe.utils.files import read_template
 # Adapter Imports
 import vibe.core.adapters.antigravity
 import vibe.core.adapters.claude
+import vibe.core.adapters.cursor
 from vibe.core.scaffolding import build_rule_bundle, apply_write_plan
 from vibe.core.adapter_registry import AdapterRegistry
 

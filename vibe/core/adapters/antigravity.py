@@ -29,7 +29,21 @@ class AntigravityAdapter(BaseAdapter):
             "- [ ] Initial setup verified\n"
         )
         
-        # 3. Skills (Placeholder for Step C)
-        # plan.files[".agent/skills/..."] = ...
+        # 3. Skills (Step C Implementation)
+        for script_name, content in rule_bundle.scripts.items():
+            skill_base = script_name.replace(".py", "")
+            skill_dir = f".agent/skills/{skill_base}"
+            
+            # SKILL.md
+            plan.files[f"{skill_dir}/SKILL.md"] = (
+                "---\n"
+                f"description: Skill wrapper for {skill_base}\n"
+                "---\n\n"
+                f"# {skill_base}\n"
+                "Auto-generated skill wrapper.\n"
+            )
+            
+            # run.py
+            plan.files[f"{skill_dir}/run.py"] = content
         
         return plan

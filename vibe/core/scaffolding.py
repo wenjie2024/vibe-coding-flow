@@ -66,6 +66,15 @@ def build_rule_bundle(context: Dict[str, Any]) -> RuleBundle:
         # We normalize the key to 02_stack.md for consistency across adapters
         bundle.rules["02_stack.md"] = content
         
+        # Load Scripts
+        from vibe.config.paths import SCRIPTS_DIR
+        if SCRIPTS_DIR.exists():
+            for script_file in SCRIPTS_DIR.glob("*.py"):
+                try:
+                    bundle.scripts[script_file.name] = script_file.read_text(encoding="utf-8")
+                except Exception as ex:
+                    console.print(f"[yellow]Failed to load script {script_file.name}: {ex}[/yellow]")
+        
     except Exception as e:
         console.print(f"[bold red]Error building rule bundle:[/bold red] {e}")
     

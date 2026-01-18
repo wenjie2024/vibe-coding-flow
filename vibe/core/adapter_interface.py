@@ -10,12 +10,11 @@ class RuleBundle:
     """
     # Map of standard Vibe rule names to their rendered content
     # e.g., "00_project_context.md" -> "... content ..."
-    #       "02_stack.md" -> "... content ..."
     rules: Dict[str, str] = field(default_factory=dict)
     
-    # Map of skill names to their script content (if any specific generation is needed)
-    # Most likely skills are handled separately, but we can put them here if needed.
-    # For now, let's stick to rules.
+    # Map of script names to their content
+    # e.g., "inspect_sdk.py" -> "print('hello')"
+    scripts: Dict[str, str] = field(default_factory=dict)
 
 @dataclass
 class WritePlan:
