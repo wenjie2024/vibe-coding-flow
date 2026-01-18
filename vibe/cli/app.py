@@ -72,11 +72,84 @@ def extract_file_content(response: str, filename: str) -> str:
     return ""
 
 @app.command()
-def setup():
+def init(
+    force: bool = typer.Option(False, "--force", "-f", help="Force overwrite existing config"),
+):
     """
-    Placeholder for setup command.
+    Initialize global configuration for Vibe CLI (Antigravity/Claude).
     """
-    console.print("[green]Setup command placeholder[/green]")
+    console.print(Panel("[bold blue]Vibe-CLI Global Setup[/bold blue]", expand=False))
+    
+    ide_choice = Prompt.ask(
+        "Which IDE do you use primarily?",
+        choices=["antigravity", "claude", "all"],
+        default="antigravity"
+    )
+    
+    # Resolve Paths
+    from vibe.config.paths import PACKAGE_ROOT
+    global_assets = PACKAGE_ROOT / "lib" / "global"
+    
+    if not global_assets.exists():
+        console.print(f"[bold red]Error:[/bold red] Global assets not found at {global_assets}")
+        raise typer.Exit(1)
+
+    # --- Antigravity Setup ---
+    if ide_choice in ["antigravity", "all"]:
+        home = Path.home()
+        gemini_root = home / ".gemini"
+        gemini_root.mkdir(exist_ok=True)
+        
+        # 1. GEMINI.md
+        target_gemini = gemini_root / "GEMINI.md"
+        source_gemini = global_assets / "GEMINI_CN.md"
+        
+        if target_gemini.exists() and not force:
+            should_overwrite = typer.confirm(f"Found existing {target_gemini}. Overwrite?", default=False)
+        else:
+            should_overwrite = True
+            
+        if should_overwrite:
+            shutil.copy(source_gemini, target_gemini)
+            console.print(f"[green]✅ Copied Global Rules to: {target_gemini}[/green]")
+        else:
+            console.print(f"[dim]Skipped {target_gemini}[/dim]")
+
+        # 2. Skills
+        target_skills = gemini_root / "skills"
+        source_skills = global_assets / "skills"
+        
+        if target_skills.exists() and not force:
+            should_overwrite_skills = typer.confirm(f"Found existing skills at {target_skills}. Overwrite/Merge?", default=False)
+        else:
+            should_overwrite_skills = True
+            
+        if should_overwrite_skills:
+            shutil.copytree(source_skills, target_skills, dirs_exist_ok=True)
+            console.print(f"[green]✅ Installed Global Skills to: {target_skills}[/green]")
+        else:
+            console.print(f"[dim]Skipped Skills installation[/dim]")
+
+    # --- Claude Setup ---
+    if ide_choice in ["claude", "all"]:
+        console.print("\n[bold yellow]ℹ️  Claude Code Setup[/bold yellow]")
+        console.print("Claude Code uses project-level configuration mostly.")
+        console.print(f"Global templates are available at: [bold]{global_assets}[/bold]")
+        console.print("You can copy `CLAUDE_zh.md` to your project roots as a base.")
+
+def _check_global_config(ide: str):
+    """Checks if global config is set up for the chosen IDE."""
+    home = Path.home()
+    if ide == "antigravity":
+        gemini_rules = home / ".gemini" / "GEMINI.md"
+        if not gemini_rules.exists():
+            console.print(Panel(
+                "[bold yellow]⚠️  Global Rules Not Found[/bold yellow]\n\n"
+                f"We couldn't find [bold]{gemini_rules}[/bold].\n"
+                "Antigravity might not behave as expected (e.g., wrong language).\n\n"
+                "👉 [bold]Recommendation:[/bold] Run `python -m vibe init` to set it up.",
+                title="Configuration Check"
+            ))
 
 @app.command()
 def create(
@@ -93,6 +166,9 @@ def create(
     """
     Starts a new AI-Ready project from a prompt.
     """
+    # Check Global Config First
+    _check_global_config(ide)
+
     # Resolve path and name
     project_dir = Path(project_path).resolve()
     project_name = project_dir.name
