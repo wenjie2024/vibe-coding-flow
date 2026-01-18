@@ -36,8 +36,13 @@ Vibe-CLI 会为每个新项目生成四样“必需品”，让你**不再手动
     *   复制 `vibe/lib/global/GEMINI_CN.md` -> `%USERPROFILE%\.gemini\GEMINI.md`
 *   **Claude Code 用户**:
     *   复制 `vibe/lib/global/CLAUDE_zh.md` -> 全局配置或作为项目 `CLAUDE.md` 的基础。
-*   **全局技能 (Global Skills)**:
-    *   `vibe/lib/global/skills/` 目录下包含了一些官方推荐的通用技能，可根据需要集成到各个项目中。
+*   **官方/全局技能 (Global Skills)**:
+    *   源目录: `vibe/lib/global/skills/` (含多种官方推荐技能，如 `frontend-design`, `mcp-builder` 等)
+    *   **集成目标路径 (Target Folders)**:
+        *   🤖 **Antigravity**: 直接将技能文件夹复制到 `[项目根目录]/.agent/skills/` 下。
+            *   例: 复制 `vibe/lib/global/skills/frontend-design` -> `my-project/.agent/skills/frontend-design`
+        *   🤖 **Claude Code**: 将技能中的核心脚本 (通常是 `run.py` 或主要 `.py` 文件) 复制到 `.claude/skills/` 并重命名。
+            *   例: 复制 `.../pdf/run.py` -> `my-project/.claude/skills/pdf.py`
 
 > **Note**: 这些是用户级的全局偏好。Vibe-CLI 创建项目时生成的 `.agent/rules` 是项目级规则，优先级通常更高或互补。
 
