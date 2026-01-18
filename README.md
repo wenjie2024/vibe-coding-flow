@@ -184,6 +184,15 @@ A: 它确保 AI 在 IDE 里不会“随手乱来”，例如禁止直接调用 O
 
 ---
 
+## 📅 Roadmap
+
+### Planned Features (Deferred)
+*   **Multi-IDE Support**: In future versions, Vibe-CLI plans to support generating rules for other IDEs such as Claude Code (`CLAUDE.md`) and Cursor (`.cursorrules`). Currently, it default to Antigravity (`.agent/rules`).
+    *   Goal: Enable seamless "Vibe Context" injection into any AI coding tool.
+    *   Status: Infrastructure ready (Adapter Pattern), CLI integration pending.
+
+---
+
 ## 📄 License
 
 本项目采用 **Apache License 2.0** 协议开源。详情请见 [LICENSE](LICENSE) 文件。
