@@ -13,11 +13,30 @@ This skill helps you automatically identify and fix common linting errors in Pyt
 - Before committing code to ensure quality.
 - To bulk-fix style issues.
 
+## Prerequisites
+
+Ensure these tools are installed in your environment:
+```bash
+pip install pylint autopep8 isort black
+```
+
 ## Workflow
 
 1.  **Analyze**: Run the linter to list errors.
-2.  **Auto-Fix**: Run the fixer script to apply automatic patches (e.g., white space, unused imports).
-3.  **Manual Fix**: For remaining complex errors, fix them manually following the linter's advice.
+2.  **Auto-Fix**: Run the fixer script to apply automatic patches.
+3.  **Manual Fix**: For remaining complex errors, fix them manually.
+
+## Auto-Fix Capabilities
+
+**Automatically Fixed:**
+- Whitespace (trailing spaces, blank lines)
+- Import sorting and unused imports
+- Line length wrapping (via `black` or `autopep8`)
+
+**Requires Manual Fix:**
+- Variable naming (snake_case violations)
+- Complex logic issues (cyclomatic complexity)
+- Missing docstrings
 
 ## Tools
 

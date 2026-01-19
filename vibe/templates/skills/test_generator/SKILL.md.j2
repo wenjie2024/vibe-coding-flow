@@ -26,8 +26,27 @@ This will:
 2. Create `tests/test_{filename}.py`.
 3. Generate `def test_funcname():` stubs.
 
+### Example Output
+
+For `src/calculator.py`, it generates `tests/test_calculator.py`:
+
+```python
+import pytest
+from src.calculator import Calculator
+
+def test_add():
+    # TODO: Implement test for add
+    assert True
+```
+
 ## Rules
 
 1.  **Framework**: Use `pytest`.
 2.  **Naming**: Test files must start with `test_`.
 3.  **Isolation**: Mock external dependencies (DB, Network) using `unittest.mock` or `pytest-mock`.
+
+## Coverage Goals
+
+- **Minimum**: All public methods have at least one test.
+- **Recommended**: Cover happy path + 2-3 edge cases per method.
+- **Assertion**: Use `pytest.raises()` for expected exceptions.

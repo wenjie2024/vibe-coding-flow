@@ -216,6 +216,20 @@ python -m vibe create my-project --ide antigravity
 
 > **Note**: 也就是在原有的命令基础上，加上 `--ide <tool>` 即可。不加则默认为 `antigravity`。
 
+## 🧰 Project Skills (内置技能)
+
+Vibe 2.0 自动为每个新项目注入经过 AI 优化的技能包（Skill Packs）。这些技能遵循 Claude 官方规范，可跨 IDE 使用：
+
+| Skill | 描述 | 位置 (Antigravity/Claude/Cursor) |
+| :--- | :--- | :--- |
+| **doc-maintainer** | 自动分析代码变更并同步文档（README/PRD） | `.agent/skills/doc-maintainer/` |
+| **lint_autofix** | Python 代码风格自动检测与修复 | `.agent/skills/lint_autofix/` |
+| **test_generator** | 基于代码 AST 自动生成 Pytest 测试桩 | `.agent/skills/test_generator/` |
+
+> **Usage**: 您的 AI Agent (如 Claude Code 或 Gemini) 可以直接调用这些技能。
+> Example: *"Run the test generator on src/api.py"*
+
+
 ---
 
 ## 📅 Roadmap
