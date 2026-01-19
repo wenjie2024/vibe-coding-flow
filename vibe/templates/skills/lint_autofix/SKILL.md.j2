@@ -1,0 +1,43 @@
+---
+name: lint-autofix
+description: Automatically fixes common linting errors (Python specific).
+---
+
+# Lint Autofix (Python)
+
+This skill helps you automatically identify and fix common linting errors in Python code.
+
+## When to Use
+
+- When you see lint errors in the IDE.
+- Before committing code to ensure quality.
+- To bulk-fix style issues.
+
+## Workflow
+
+1.  **Analyze**: Run the linter to list errors.
+2.  **Auto-Fix**: Run the fixer script to apply automatic patches (e.g., white space, unused imports).
+3.  **Manual Fix**: For remaining complex errors, fix them manually following the linter's advice.
+
+## Tools
+
+### 1. Check Lint Status
+
+```bash
+# Checks the entire project or specific file
+pylint {{ target_file_or_dir }} --output-format=text
+```
+
+### 2. Auto-Fix Script
+
+Run the helper script which uses `autopep8` or `isort` (if available) and regex replacement for common patterns.
+
+```bash
+python .agent/skills/lint-autofix/scripts/fix_python.py {{ target_file }}
+```
+
+## Rules
+
+1.  **Safety First**: The fixer script backs up files before modifying.
+2.  **No Logic Changes**: Pure lint fixes should not alter program logic.
+3.  **Verification**: Always run the tests after applying lint fixes.

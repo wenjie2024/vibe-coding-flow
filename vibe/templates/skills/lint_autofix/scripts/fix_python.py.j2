@@ -1,0 +1,55 @@
+import sys
+import os
+import subprocess
+import shutil
+
+def run_formatter(filepath):
+    """Runs standard formatters if available."""
+    print(f"Running formatters on {filepath}...")
+    
+    # Try isort
+    try:
+        subprocess.run(["isort", filepath], check=False, capture_output=True)
+        print("  - Applied isort")
+    except FileNotFoundError:
+        print("  - isort not found (skipped)")
+
+    # Try black or autopep8
+    try:
+        subprocess.run(["black", filepath], check=False, capture_output=True)
+        print("  - Applied black")
+    except FileNotFoundError:
+        try:
+            subprocess.run(["autopep8", "--in-place", filepath], check=False, capture_output=True)
+            print("  - Applied autopep8")
+        except FileNotFoundError:
+            print("  - No formatter (black/autopep8) found.")
+
+def manual_regex_fixes(filepath):
+    """Applies simple regex-based fixes for things formatters might miss."""
+    # Placeholder for custom regex logic if needed
+    pass
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python fix_python.py <filepath>")
+        sys.exit(1)
+        
+    filepath = sys.argv[1]
+    if not os.path.exists(filepath):
+        print(f"Error: File {filepath} not found.")
+        sys.exit(1)
+        
+    # Backup
+    backup_path = filepath + ".bak"
+    shutil.copy2(filepath, backup_path)
+    print(f"Backed up to {backup_path}")
+    
+    # Run Fixes
+    run_formatter(filepath)
+    manual_regex_fixes(filepath)
+    
+    print("Done. Please verify changes.")
+
+if __name__ == "__main__":
+    main()

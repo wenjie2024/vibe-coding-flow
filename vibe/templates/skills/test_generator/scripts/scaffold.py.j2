@@ -1,0 +1,78 @@
+import ast
+import sys
+import os
+from pathlib import Path
+
+def get_public_functions_and_classes(filepath):
+    """Parses python file and returns list of top-level function/class names."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        tree = ast.parse(f.read())
+        
+    names = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            if not node.name.startswith("_"):
+                names.append(node.name)
+    return names
+
+def generate_test_content(module_name, names):
+    lines = [
+        "import pytest",
+        "from unittest.mock import MagicMock, patch",
+        f"from {module_name} import *  # Adjust import as needed",
+        "",
+    ]
+    
+    for name in names:
+        lines.append(f"def test_{name}():")
+        lines.append(f"    # TODO: Implement test for {name}")
+        lines.append("    assert True")
+        lines.append("")
+        
+    return "\n".join(lines)
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python scaffold.py <source_file>")
+        sys.exit(1)
+        
+    source_path = Path(sys.argv[1])
+    if not source_path.exists():
+        print(f"Error: {source_path} not found.")
+        sys.exit(1)
+        
+    # Determine test path
+    # heuristic: if in src/foo.py -> tests/test_foo.py
+    # heuristic: if in root/foo.py -> tests/test_foo.py
+    project_root = Path.cwd() 
+    tests_dir = project_root / "tests"
+    tests_dir.mkdir(exist_ok=True)
+    
+    test_filename = f"test_{source_path.stem}.py"
+    test_path = tests_dir / test_filename
+    
+    if test_path.exists():
+        print(f"Test file already exists: {test_path}")
+        print("Skipping scaffolding to avoid overwrite.")
+        return
+
+    # Analyze source
+    try:
+        names = get_public_functions_and_classes(source_path)
+    except Exception as e:
+        print(f"Failed to parse source: {e}")
+        names = []
+        
+    # Determine import module name (simple heuristic)
+    module_name = source_path.stem
+    
+    content = generate_test_content(module_name, names)
+    
+    with open(test_path, "w", encoding="utf-8") as f:
+        f.write(content)
+        
+    print(f"✅ Generated test scaffold: {test_path}")
+    print(f"   (Covering: {', '.join(names)})")
+
+if __name__ == "__main__":
+    main()

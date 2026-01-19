@@ -29,7 +29,7 @@ class AntigravityAdapter(BaseAdapter):
             "- [ ] Initial setup verified\n"
         )
         
-        # 3. Skills (Step C Implementation)
+        # 3. Scripts (Legacy Flat Scripts)
         for script_name, content in rule_bundle.scripts.items():
             skill_base = script_name.replace(".py", "")
             skill_dir = f".agent/skills/{skill_base}"
@@ -45,5 +45,12 @@ class AntigravityAdapter(BaseAdapter):
             
             # run.py
             plan.files[f"{skill_dir}/run.py"] = content
+
+        # 4. Project Skills (New Standard Structure)
+        for skill_name, skill_files in rule_bundle.skills.items():
+            base_path = Path(".agent/skills") / skill_name
+            for rel_path, content in skill_files.items():
+                target_path = (base_path / rel_path).as_posix()
+                plan.files[target_path] = content
         
         return plan

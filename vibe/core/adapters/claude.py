@@ -83,6 +83,16 @@ class ClaudeAdapter(BaseAdapter):
              plan.files[skill_path] = content
              skills_summary.append(f"- **{script_name}**: (Located at `{skill_path}`)")
 
+        # 5. Project Skills (New Standard Structure)
+        for skill_name, skill_files in rule_bundle.skills.items():
+            base_path = Path(".claude/skills") / skill_name
+            for rel_path, content in skill_files.items():
+                target_path = (base_path / rel_path).as_posix()
+                plan.files[target_path] = content
+            
+            # Add to summary
+            skills_summary.append(f"- **{skill_name}**: Located at `{base_path.as_posix()}/`")
+
         # Append Skills to CLAUDE.md if any
         if skills_summary:
             claude_content.append("")

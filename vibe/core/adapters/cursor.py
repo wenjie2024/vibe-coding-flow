@@ -44,5 +44,29 @@ class CursorAdapter(BaseAdapter):
             f"{stack_content}\n"
         )
         plan.files[".cursor/rules/02_stack.mdc"] = stack_mdc
-        
+
+        # 3. Project Skills
+        # We place them in .cursor/skills/ and add a rule telling Cursor about them
+        skills_summary = []
+        for skill_name, skill_files in rule_bundle.skills.items():
+            base_path = Path(".cursor/skills") / skill_name
+            for rel_path, content in skill_files.items():
+                target_path = (base_path / rel_path).as_posix()
+                plan.files[target_path] = content
+            
+            skills_summary.append(f"- **{skill_name}**: Located at `{base_path.as_posix()}/SKILL.md`")
+            
+        if skills_summary:
+            skills_mdc = (
+                "---\n"
+                "description: Available Project Skills & Tools\n"
+                "globs: *\n"
+                "---\n\n"
+                "# Project Skills\n\n"
+                "You have access to the following specialized skills. "
+                "Read the `SKILL.md` in the respective directories for usage instructions.\n\n"
+                + "\n".join(skills_summary)
+            )
+            plan.files[".cursor/rules/90_skills.mdc"] = skills_mdc
+
         return plan

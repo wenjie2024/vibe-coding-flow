@@ -1,0 +1,33 @@
+---
+name: test-generator
+description: Generates boilerplate unit tests for Python code (Pytest).
+---
+
+# Test Generator (Python/Pytest)
+
+This skill helps you generate robust unit tests for existing Python code, following TDD or post-implement testing patterns.
+
+## Workflow
+
+1.  **Identify Target**: Decide which file or class needs testing.
+2.  **Generate Scaffold**: Use the helper script to create a test file with imports and placeholders.
+3.  **Fill Logic**: (Agent Task) Read the source code and implement specific test cases in the generated file.
+
+## Tools
+
+### Scaffold Test File
+
+```bash
+python .agent/skills/test-generator/scripts/scaffold.py {{ source_file_path }}
+```
+
+This will:
+1. Detect the class/function names in `source_file`.
+2. Create `tests/test_{filename}.py`.
+3. Generate `def test_funcname():` stubs.
+
+## Rules
+
+1.  **Framework**: Use `pytest`.
+2.  **Naming**: Test files must start with `test_`.
+3.  **Isolation**: Mock external dependencies (DB, Network) using `unittest.mock` or `pytest-mock`.

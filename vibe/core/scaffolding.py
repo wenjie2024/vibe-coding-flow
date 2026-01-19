@@ -6,7 +6,7 @@ from typing import Dict, Any, List
 
 from vibe.core.adapter_interface import RuleBundle, WritePlan
 from rich.console import Console
-from vibe.config.paths import RULES_DIR
+from vibe.config.paths import RULES_DIR, TEMPLATES_DIR
 from vibe.utils.files import read_template
 
 console = Console()
@@ -74,6 +74,35 @@ def build_rule_bundle(context: Dict[str, Any]) -> RuleBundle:
                     bundle.scripts[script_file.name] = script_file.read_text(encoding="utf-8")
                 except Exception as ex:
                     console.print(f"[yellow]Failed to load script {script_file.name}: {ex}[/yellow]")
+
+        # 4. Load Project Skills (Dynamic)
+        SKILLS_DIR = TEMPLATES_DIR / "skills"
+        if SKILLS_DIR.exists():
+            for skill_dir in SKILLS_DIR.iterdir():
+                if skill_dir.is_dir():
+                    skill_name = skill_dir.name
+                    skill_files = {}
+                    
+                    # Walk the skill directory
+                    for file_path in skill_dir.rglob("*"):
+                        if file_path.is_file():
+                            try:
+                                # Rel path inside skill dir (e.g. "scripts/analyze.py")
+                                rel_path = file_path.relative_to(skill_dir)
+                                # Handle .j2 extension (strip it for the target filename)
+                                target_name = str(rel_path)
+                                if target_name.endswith(".j2"):
+                                    target_name = target_name[:-3]
+                                
+                                # Read content (simple read for now, no complex Jinja context yet)
+                                content = file_path.read_text(encoding="utf-8")
+                                skill_files[target_name] = content
+                            except Exception as ex:
+                                console.print(f"[yellow]Failed to load skill file {file_path}: {ex}[/yellow]")
+                    
+                    if skill_files:
+                        bundle.skills[skill_name] = skill_files
+
         
     except Exception as e:
         console.print(f"[bold red]Error building rule bundle:[/bold red] {e}")

@@ -16,6 +16,13 @@ class RuleBundle:
     # e.g., "inspect_sdk.py" -> "print('hello')"
     scripts: Dict[str, str] = field(default_factory=dict)
 
+    # Map of skill name to its internal files
+    # e.g., "doc-maintainer" -> {
+    #    "SKILL.md": "...",
+    #    "scripts/analyze.py": "..."
+    # }
+    skills: Dict[str, Dict[str, str]] = field(default_factory=dict)
+
 @dataclass
 class WritePlan:
     """
