@@ -18,7 +18,9 @@ class AntigravityAdapter(BaseAdapter):
         for rule_name, content in rule_bundle.rules.items():
             # e.g., "00_project_context.md" -> ".agent/rules/00_project_context.md"
             target_path = f".agent/rules/{rule_name}"
-            plan.files[target_path] = content
+            # Inject correct skills path
+            final_content = content.replace("{{SKILLS_DIR}}", ".agent/skills")
+            plan.files[target_path] = final_content
             
         # 2. task.md (Pointer)
         # Antigravity uses task.md as a primary artifact. 

@@ -30,7 +30,7 @@ class CursorAdapter(BaseAdapter):
             "## 2. Architecture\n"
             "Read `.context/systemPatterns.md` for architectural patterns.\n\n"
             "## 3. Workflow\n"
-            f"{rule_bundle.rules.get('01_workflow.md', '')}\n"
+            f"{rule_bundle.rules.get('01_workflow.md', '').replace('{{SKILLS_DIR}}', '.cursor/skills')}\n"
         )
         plan.files[".cursor/rules/00_core.mdc"] = core_mdc
         

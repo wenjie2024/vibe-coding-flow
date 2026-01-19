@@ -22,5 +22,5 @@ Before writing any code or executing commands, you MUST:
 
 ## Exit Criteria
 - Before marking a task as DONE, you MUST run `doc-maintainer` to ensure `README.md` and Architecture docs match the new code.
-- Command: `python .agent/skills/doc-maintainer/scripts/analyze.py --since HEAD~1`
+- Command: `python {{SKILLS_DIR}}/doc-maintainer/scripts/analyze.py --since HEAD~1`
 

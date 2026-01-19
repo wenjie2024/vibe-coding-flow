@@ -24,17 +24,17 @@ class ClaudeAdapter(BaseAdapter):
             "- **System Architecture**: Read `.context/systemPatterns.md` for tech stack.",
             "",
             "## Workflow",
-            rule_bundle.rules.get("01_workflow.md", ""),
+            rule_bundle.rules.get("01_workflow.md", "").replace("{{SKILLS_DIR}}", ".claude/skills"),
             "",
             "## Tech Stack",
-            rule_bundle.rules.get("02_stack.md", ""), # Normalized key
+            rule_bundle.rules.get("02_stack.md", "").replace("{{SKILLS_DIR}}", ".claude/skills"), # Normalized key
             "",
             "## Output Format",
-            rule_bundle.rules.get("03_output_format.md", ""),
+            rule_bundle.rules.get("03_output_format.md", "").replace("{{SKILLS_DIR}}", ".claude/skills"),
             "",
             "## Environment & LLM",
-            rule_bundle.rules.get("00a_project_environment.md", ""),
-            rule_bundle.rules.get("00b_llm_integration.md", ""),
+            rule_bundle.rules.get("00a_project_environment.md", "").replace("{{SKILLS_DIR}}", ".claude/skills"),
+            rule_bundle.rules.get("00b_llm_integration.md", "").replace("{{SKILLS_DIR}}", ".claude/skills"),
         ]
         
         # Clean up empty lines or None
