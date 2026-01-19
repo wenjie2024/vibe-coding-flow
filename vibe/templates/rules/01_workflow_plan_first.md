@@ -19,3 +19,8 @@ Before writing any code or executing commands, you MUST:
 - **Strict Path**: Plans MUST live in `/plan/`.
 - **Never guess**: If requirements are ambiguous, ask clarifying questions.
 - **Context Awareness**: Always check `.agent/rules/00_project_context.md` and previous plans in `/plan/` for history.
+
+## Exit Criteria
+- Before marking a task as DONE, you MUST run `doc-maintainer` to ensure `README.md` and Architecture docs match the new code.
+- Command: `python .agent/skills/doc-maintainer/scripts/analyze.py --since HEAD~1`
+
