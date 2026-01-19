@@ -5,230 +5,150 @@
 它解决的不是“写代码”，而是 **Day 0 环境与上下文的摩擦**：当你第一次用 Cursor / VSCode / Antigravity 打开项目时，AI Agent 看到的是一个已经准备好的工程——**环境可复现、规则可执行、计划可跟随**。
 
 > **目标**：用最少步骤获得 “开箱即用的 Vibe Coding 环境”
-> **结果**：`SETUP_GUIDE_ZH.md + preflight.py + .agent/rules + .context/` 一次生成，项目可立即进入开发状态 ✅
+> **结果**：`SETUP_GUIDE_ZH.md + preflight.py + Rules + Context` 一次生成，项目可立即进入开发状态 ✅
 
 ---
 
-## ✅ 你会得到什么（核心产出）
- 
-Vibe-CLI 会为每个新项目生成四样“必需品”，让你**不再手动搭环境/写规则/写计划**：
+## 🚀 Quick Start：3 分钟跑通 Vibe 环境
 
-1. **环境搭建指南**：`SETUP_GUIDE_ZH.md`
-   手把手把 Conda + SDK + 项目变量配置到位（不靠口口相传）
-2. **环境自检脚本**：`preflight.py`
-   一键检测：Python/Conda/依赖/SDK/配置是否齐全，确保“能跑再开工”
-3. **AI 行为规则**：`.agent/rules/`
-   强制 AI 遵守项目规范（例如：必须走 `my_llm_sdk`、禁止直连厂商 SDK 等）
-4. **项目记忆库**：`.context/`
-   PRD / 架构 / 当前计划，确保 AI 在 IDE 里“有上下文地持续工作”
+> **核心流程**：安装依赖 → 创建项目 (选 IDE) → 按指南 Setup + 自检
 
---- 
-
-## 🚀 Quick Start：3 分钟跑通 Vibe 环境（推荐路径）
-
-> 你只需要做三件事：安装依赖 → 创建项目 → 按指南 setup + 自检全绿
-
-### 1) 全局配置 (Global Rules) - [Antigravity/Claude 用户推荐]
-
-建议将本仓库 `vibe/lib/global/` 下的配置文件复制到您的个人配置目录，作为所有项目的默认行为准则。
-
-*   **Antigravity 用户**:
-    *   复制 `vibe/lib/global/GEMINI_CN.md` -> `%USERPROFILE%\.gemini\GEMINI.md`
-*   **Claude Code 用户**:
-    *   复制 `vibe/lib/global/CLAUDE_zh.md` -> 全局配置或作为项目 `CLAUDE.md` 的基础。
-*   **官方/全局技能 (Global Skills)**:
-    *   源目录: `vibe/lib/global/skills/` (含多种官方推荐技能，如 `frontend-design`, `mcp-builder` 等)
-    *   **集成目标路径 (Target Folders)**:
-        *   🤖 **Antigravity (Global)**: 复制到用户主目录下的 `.gemini/skills/` 中，即可在所有项目中通用。
-            *   Win: `%USERPROFILE%\.gemini\skills\`
-            *   Mac/Linux: `~/.gemini/skills/`
-        *   🤖 **Claude Code**: 目前主要支持项目级配置。若需全局使用，建议将通用脚本放在固定目录，并在全局 `CLAUDE.md` (如有) 中引用，或配置为全局 MCP Server。
-
-> **Note**: 这些是用户级的全局偏好。Vibe-CLI 创建项目时生成的 `.agent/rules` 是项目级规则，优先级通常更高或互补。
-
-### 2) 安装
-
+### 1. 安装 Vibe CLI
 ```bash
 # 在 vibe-coding-flow 根目录
 pip install -r requirements.txt
-
-# 初始化 SDK 配置（必做：创建/检查当前目录 config.yaml，用于 API Key）
-python -m my_llm_sdk.cli init
+python -m my_llm_sdk.cli init  # 初始化 API Key 配置
 ```
 
-### 2) 创建项目（生成“可 Vibe Coding 的工程骨架”）
+### 2. 创建项目 (Generate)
 
-**方式一：一句话需求（适合简单项目）**
+使用 `vibe create` 命令生成项目骨架。支持通过 `--ide` 参数适配不同的 AI 工具。
+
+**场景 A：交互式创建 (推荐)**
 ```bash
-python vibe.py create <PROJECT_PATH> --prompt "你的想法" --interactive
+# 默认生成 Antigravity 配置
+python vibe.py create my-project --prompt "写一个贪吃蛇游戏" -i
+
+# 生成 Cursor 配置
+python vibe.py create my-project --prompt "写一个贪吃蛇游戏" -i --ide cursor
 ```
 
-**方式 B：详细需求模板**
+**场景 B：基于需求文档 (复杂项目)**
 ```bash
-python vibe.py create my-project --promptfile requirements.md -i
+# 生成 Claude Code 配置
+python vibe.py create my-project --promptfile requirements.md -i --ide claude
 ```
-> 如果 `requirements.md` 不存在，会自动生成包含 15 个章节的需求模板。建议配合 `-i` 使用，即使文档再全，最后的人工确认也是“不翻车”的关键。
 
-* `--interactive (-i)`：建议默认开启，用于确认需求和技术栈。
-* `python vibe.py plan my-project`：创建后运行，生成第一阶段计划。即使使用了详细模板，交互模式仍能让你在 AI 生成 PRD 后进行最后的锁定与微调。
-* `--promptfile`：支持结构化需求输入，包含目标、用户故事、验收标准等深度上下文。支持与 `-i` 模式叠加使用。
+> **IDE 选项**: `--ide antigravity` (默认), `--ide claude`, `--ide cursor`
 
-### 3) 一键把环境跑到全绿 ✅（进入项目目录）
-
+### 3. Setup & Verify (进入项目)
 ```bash
-cd <PROJECT_PATH>
-# 按 SETUP_GUIDE_ZH.md 操作完成环境配置（通常只需 conda create 和 pip install git+...）
+cd my-project
+# 1. 按 SETUP_GUIDE_ZH.md 完成环境配置 (新建 Conda 环境等)
+# 2. 运行自检
 python preflight.py
 ```
-
-当 `preflight.py` 全绿后，你已经拥有一个“AI-Ready + 可复现”的 Vibe Coding 工程。
-
----
-
-## 🧭 标准工作流（The Vibe Way）
-
-### Step 1. Create（生成上下文 + 环境骨架）
-
-```bash
-# 方式 A：直接输入
-python vibe.py create <PROJECT_PATH> --prompt "你的想法" --interactive
-
-# 方式 B：使用需求模板（推荐复杂项目）
-python vibe.py create <PROJECT_PATH> --promptfile requirements.md -i
-```
-
-### Step 2. Plan（生成 Phase 1 的执行计划）
-
-```bash
-python vibe.py plan <PROJECT_PATH>
-```
-
-### Step 3. Setup（按指南搭环境 + 自检确保可用）
-
-进入项目目录后，按 `SETUP_GUIDE_ZH.md` 完成：
-
-1. 创建 Conda 环境
-2. 安装 SDK（`pip install git+https://github.com/wenjie2024/my-llm-sdk.git`）
-3. 初始化 SDK（如果尚未配置过）
-4. 运行自检：`python preflight.py` 全绿 ✅
-
-### Step 4. Code（在 IDE 中按计划推进）
-
-```bash
-code .
-```
-
-在 IDE Chat 输入：
-**`Start Phase 1, follow activeContext.md`**
+**当 `preflight.py` 全绿 ✅，你就可以开始 Vibe Coding 了。**
 
 ---
 
-## 🏗️ 系统架构（为什么它能“零摩擦”）
+## ✅ 核心产出 (What You Get)
 
-Vibe-CLI 采用**线性流水线（Linear Pipeline）**，由四个角色分别产出“能直接开工”的关键文件：
+Vibe 为每个项目生成四类“必需品”，解决从需求到编码的“最后一公里”问题：
 
-1. **Analyst（需求分析师）** → `.context/productContext.md`
-2. **Architect（系统架构师）** → `.context/systemPatterns.md`
-3. **DevOps Engineer（运维专家）** → `SETUP_GUIDE_ZH.md`, `preflight.py`, `.agent/rules/`
-4. **Project Manager（项目经理）** → `.context/activeContext.md`
+### 1. 通用基础 (Common)
+无论使用哪个 IDE，都会生成：
+*   **`.context/` (项目记忆库)**:
+    *   `productContext.md`: 需求与用户故事 (PRD)。
+    *   `systemPatterns.md`: 架构决策与技术栈。
+    *   `activeContext.md`: 当前任务状态与计划指针。
+*   **`SETUP_GUIDE_ZH.md`**: 环境搭建保姆级教程。
+*   **`preflight.py`**: 环境完整性自检脚本。
 
-重点在 DevOps 这一段：**把“环境一致性”变成可执行文档 + 可验证脚本**，而不是口头约定。
+### 2. IDE 专属配置 (IDE Specific)
+Vibe 根据 `--ide` 参数生成不同的规则结构：
 
----
-
-## 📂 生成的项目结构（AI 打开 IDE 看到的就是这个）
-
+#### 🤖 Antigravity (Gemini)
 ```text
 my-project/
 ├── .agent/
-│   └── rules/                      # [核心] AI 行为准则（可执行的“工程纪律”）
-│       ├── 00_project_context.md   # 项目摘要（给 AI 快速进入状态）
-│       ├── 00a_project_environment # 环境运行规则（强制 conda run 等）
-│       ├── 00b_llm_integration     # LLM 调用规则（必须走 my_llm_sdk）
+│   ├── rules/                  # 行为准则
+│   │   ├── 00_project_context.md
+│   │   └── ...
+│   └── skills/                 # Project Skills (脚本)
+│       ├── doc-maintainer/
 │       └── ...
-├── .context/                       # [核心] 项目记忆库（AI 的“长期上下文”）
-│   ├── productContext.md           # 需求文档（PRD）
-│   ├── systemPatterns.md           # 架构文档（含 Critical Rules）
-│   ├── activeContext.md            # 当前计划（Phase / 任务拆解）
-│   └── project_env.yaml            # 环境配置（用于一致性/复现）
-├── SETUP_GUIDE_ZH.md               # [关键] 环境搭建保姆级教程
-├── preflight.py                    # [关键] 环境自检脚本（跑通再开工）
-└── README.md
+└── task.md                     # 任务指针文件
+```
+
+#### 🟣 Claude Code
+```text
+my-project/
+├── CLAUDE.md                   # 核心规则文件 (单一入口)
+├── .claude/
+│   ├── settings.json           # 权限配置
+│   ├── mcp.json                # MCP 工具链
+│   └── skills/                 # Project Skills (脚本)
+│       └── ...
+└── .gitignore                  # 忽略本地配置
+```
+
+#### � Cursor
+```text
+my-project/
+├── .cursor/
+│   ├── rules/
+│   │   ├── 00_core.mdc         # 核心上下文规则
+│   │   └── 90_skills.mdc       # 技能索引规则
+│   └── skills/                 # Project Skills (脚本)
+│       └── ...
+└── ...
 ```
 
 ---
-
-## 4. 标准化工作流 (Vibe Coding Best Practices)
-
-为了保证 AI 编码的质量和可维护性，Vibe-CLI 强制执行 **“先计划，后动手”** 的工作流：
-
-### 1) 强制计划目录
-所有新创建的项目都包含一个 `plan/` 目录。在进行任何非琐碎的功能开发或版本更新前，AI 代理会按照 `.agent/rules/01_workflow_plan_first.md` 的规定，在此目录下生成并保存计划文件。
-
-### 2) 命名规范
-*   **重大阶段**: `plan_phase1.md`, `plan_phase2.md` ...
-*   **功能/版本更新**: `plan_v1.0_Login.md`, `plan_v1.1_OAuth.md` ...
-*   **迭代微调**: `plan_v1.11_Fix_Redirection.md` (针对 v1.1 的小改动)
-
-### 3) 为什么这么做？
-*   **思想钢印**: 强制 AI 在动手前理清逻辑，减少“幻觉”和低级错误。
-*   **可回溯性**: 所有的架构决策和实施路径都有案可查。
-*   **协作一致性**: 即使切换不同的 AI 代理或人工介入，也能根据 `plan/` 快速接手上下文。
-
----
-
-## 🔍 常见问题（FAQ）
-
-**Q: 为什么要 `preflight.py`？**
-A: 因为 Vibe Coding 的第一原则是：**能跑再写**。`preflight.py` 把环境问题前置，一次解决，避免你在 IDE 里让 AI “边写边炸”。
-
-**Q: 为什么需要 `.agent/rules/`？**
-A: 它确保 AI 在 IDE 里不会“随手乱来”，例如禁止直接调用 OpenAI/Gemini SDK，统一走 `my_llm_sdk`，从而让工程保持一致和可维护。
-
----
-
-## 🔌 多 IDE 支持 (Multi-IDE Support)
-
-Vibe-CLI 2.0 引入了**适配器架构 (Adapter Architecture)**，支持为不同的 AI 编程工具生成原生的配置和规则。
-
-### 支持的 IDE
-
-| IDE / Tool | 生成配置 | 核心机制 |
-| :--- | :--- | :--- |
-| **Antigravity** (Default) | `.agent/rules/`, `.agent/skills/` | 标准规则 + 技能脚本映射 |
-| **Claude Code** | `CLAUDE.md`, `.claude/settings.json` | 单一规则文件 + 权限自动合并 |
-| **Cursor** | `.cursor/rules/*.mdc` | 现代 MDC 格式规则包 (亦支持旧版 `.cursorrules`) |
-
-### 使用方法
-
-`--ide` 参数可以与现有的 `--prompt`、`--interactive` 等参数**任意组合**。
-
-```bash
-# 场景 1：标准交互式创建 (生成 Cursor 规则)
-python -m vibe create my-project --prompt "写一个贪吃蛇游戏" --interactive --ide cursor
-
-# 场景 2：使用需求文档 + Claude Code
-python -m vibe create my-project --promptfile requirements.md --ide claude
-
-# 场景 3：仅生成配置 (默认 Antigravity)
-python -m vibe create my-project --ide antigravity
-```
-
-> **Note**: 也就是在原有的命令基础上，加上 `--ide <tool>` 即可。不加则默认为 `antigravity`。
 
 ## 🧰 Project Skills (内置技能)
 
-Vibe 2.0 自动为每个新项目注入经过 AI 优化的技能包（Skill Packs）。这些技能遵循 Claude 官方规范，可跨 IDE 使用：
+Vibe 2.0 自动注入经过 AI 优化的技能包（Skill Packs）。这些技能遵循 Claude 官方规范，**跨 IDE 通用**：
 
-| Skill | 描述 | 位置 (Antigravity/Claude/Cursor) |
+| Skill | 描述 | 调用位置 |
 | :--- | :--- | :--- |
-| **doc-maintainer** | 自动分析代码变更并同步文档（README/PRD） | `.agent/skills/doc-maintainer/` |
-| **lint_autofix** | Python 代码风格自动检测与修复 | `.agent/skills/lint_autofix/` |
-| **test_generator** | 基于代码 AST 自动生成 Pytest 测试桩 | `.agent/skills/test_generator/` |
+| **doc-maintainer** | 自动分析代码变更并同步文档（README/PRD） | `.agent/skills`, `.claude/skills`, `.cursor/skills` (视 IDE 而定) |
+| **lint_autofix** | Python 代码风格自动检测与修复 | 同上 |
+| **test_generator** | 基于代码 AST 自动生成 Pytest 测试桩 | 同上 |
 
-> **Usage**: 您的 AI Agent (如 Claude Code 或 Gemini) 可以直接调用这些技能。
-> Example: *"Run the test generator on src/api.py"*
+> **Usage**: AI Agent 可直接调用这些脚本。例如：*"Run test generator on src/api.py"*
 
+---
+
+## 🧭 标准工作流 (The Vibe Way)
+
+Vibe 强制执行 **“Plan -> Code -> Verify -> Sync”** 的闭环：
+
+### Step 1. Plan
+在动手前，AI 必须在 `/plan/` 目录下生成计划文件（如 `plan_phase1.md`），明确目标与验证步骤。
+
+### Step 2. Code
+AI 依据规则 (`.agent/rules` 或 `CLAUDE.md`) 编写代码，严格遵守 `my_llm_sdk` 等项目约束。
+
+### Step 3. Verify
+执行测试或验证指令。
+
+### Step 4. Sync (Exit Criteria)
+**[关键]** 在标记任务完成前，必须运行 `doc-maintainer` 技能。
+> Command: `python <SKILLS_DIR>/doc-maintainer/scripts/analyze.py --since HEAD~1`
+
+这确保了文档（README/架构图）永远不会滞后于代码。
+
+---
+
+## 🏗️ 系统架构
+
+Vibe-CLI 采用 **线性流水线 (Linear Pipeline)** 架构，由四个角色分别产出关键文件：
+1.  **Analyst** → `.context/productContext.md`
+2.  **Architect** → `.context/systemPatterns.md`
+3.  **DevOps** → `SETUP_GUIDE`, `preflight.py`, `Rules/Skills`
+4.  **Project Manager** → `.context/activeContext.md`
 
 ---
 
@@ -236,8 +156,8 @@ Vibe 2.0 自动为每个新项目注入经过 AI 优化的技能包（Skill Pack
 
 *   [x] **Core Scaffolding**: 完整的上下文生成 (Product/System/Active Context).
 *   [x] **Preflight Checks**: 环境自检脚本.
-*   [x] **Multi-IDE Adapters**: 支持 Antigravity, Claude, Cursor.
-*   [ ] **Deep Research**: 集成深度调研代理 (Planning 阶段).
+*   [x] **Multi-IDE Adapters**: 支持 Antigravity, Claude, Cursor 的原生规则生成.
+*   [x] **Project Skills**: 集成 doc-maintainer, lint-autofix 等自动化技能.
 
 ---
 
