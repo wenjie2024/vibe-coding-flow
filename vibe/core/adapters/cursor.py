@@ -1,4 +1,6 @@
+from pathlib import Path
 from vibe.core.adapter_interface import BaseAdapter, RuleBundle, WritePlan
+
 from vibe.core.adapter_registry import AdapterRegistry
 
 @AdapterRegistry.register("cursor")
