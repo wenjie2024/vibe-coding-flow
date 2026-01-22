@@ -33,6 +33,7 @@ def build_rule_bundle(context: Dict[str, Any]) -> RuleBundle:
         # Fixed Rules
         bundle.rules["00a_project_environment.md"] = read_template("00a_project_environment.md", RULES_DIR)
         bundle.rules["00b_llm_integration.md"] = read_template("00b_llm_integration.md", RULES_DIR)
+        bundle.rules["02_tech_stack_standards.md"] = read_template("02_tech_stack_standards.md", RULES_DIR)
         
         # 01 Workflow
         bundle.rules["01_workflow.md"] = read_template("01_workflow_plan_first.md", RULES_DIR) # Key normalized
