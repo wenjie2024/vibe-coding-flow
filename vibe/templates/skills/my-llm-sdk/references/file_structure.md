@@ -1,0 +1,100 @@
+# Repository File Structure
+
+Total items: 94
+
+```
+📁 .claude
+📄 .gitignore
+📄 CODE_REVIEW_REPORT.md
+📄 LICENSE
+📄 README.md
+📄 README_en.md
+📄 ROADMAP.md
+📁 assets
+📄 config.example.yaml
+📁 guide
+📁 llm.project.d
+📄 llm.project.yaml
+📄 pyproject.toml
+📄 pytest.ini
+📁 scripts
+📁 src
+📄 task_status.md
+📁 tests
+  📄 settings.local.json
+  📄 banner.png
+  📁 providers
+  📄 google.yaml
+  📄 qwen.yaml
+  📄 volcengine.yaml
+  📄 benchmark_unified.py
+  📄 cleanup_test_data.py
+  📄 debug_rest_intl.py
+  📄 recalc_costs.py
+  📁 my_llm_sdk
+  📄 conftest.py
+  📄 e2e_audio_asr_only.py
+  📄 e2e_audio_matrix.py
+  📄 e2e_full_suite.py
+  📄 e2e_sdk_realtime_clone.py
+  📁 integration
+  📄 test_async_ledger.py
+  📄 test_budget_control.py
+  📄 test_client_flow.py
+  📄 test_config_injection.py
+  📄 test_config_merge.py
+  📄 test_doctor.py
+  📄 test_gemini_config.py
+  📄 test_gemini_contract.py
+  📄 test_gemini_image_gen.py
+  📄 test_multimodal_billing.py
+  📄 test_proxy_bypass.py
+  📄 test_qwen_tts.py
+  📄 test_rate_limited_sqlite.py
+  📄 test_reporting_enhanced.py
+  📄 test_resilience.py
+  📄 test_storyboard_prompt.py
+  📄 test_stream_retry.py
+    📄 google.md
+    📄 qwen.md
+    📄 volcengine.md
+    📄 __init__.py
+    📁 budget
+    📄 cli.py
+    📄 client.py
+    📁 config
+    📁 doctor
+    📁 providers
+    📄 schemas.py
+    📁 services
+    📁 utils
+    📄 __init__.py
+    📄 test_async.py
+    📄 test_reporting_cli.py
+    📄 test_streaming.py
+      📄 __init__.py
+      📄 alerts.py
+      📄 controller.py
+      📄 ledger.py
+      📄 pricing.py
+      📄 rate_limiter.py
+      📄 reporter.py
+      📄 __init__.py
+      📄 exceptions.py
+      📄 loader.py
+      📄 models.py
+      📄 __init__.py
+      📄 checker.py
+      📄 report.py
+      📄 __init__.py
+      📄 base.py
+      📄 gemini.py
+      📄 qwen.py
+      📄 volcengine.py
+      📄 __init__.py
+      📄 voice.py
+      📄 __init__.py
+      📄 media.py
+      📄 network.py
+      📄 resilience.py
+```
