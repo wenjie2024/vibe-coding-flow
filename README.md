@@ -63,6 +63,7 @@ Vibe 为每个项目生成四类“必需品”，解决从需求到编码的“
     *   `systemPatterns.md`: 架构决策与技术栈。
     *   `activeContext.md`: 当前任务状态与计划指针。
 *   **`SETUP_GUIDE_ZH.md`**: 环境搭建保姆级教程。
+*   **`NEXT_STEPS.md`**: 初始化后的操作指引 (New)。
 *   **`preflight.py`**: 环境完整性自检脚本。
 
 ### 2. IDE 专属配置 (IDE Specific)
@@ -116,6 +117,7 @@ Vibe 2.0 自动注入经过 AI 优化的技能包（Skill Packs）。这些技�
 | **doc-maintainer** | 自动分析代码变更并同步文档（README/PRD） | `.agent/skills`, `.claude/skills`, `.cursor/skills` (视 IDE 而定) |
 | **lint_autofix** | Python 代码风格自动检测与修复 | 同上 |
 | **test_generator** | 基于代码 AST 自动生成 Pytest 测试桩 | 同上 |
+| **my-llm-sdk** | 包含 SDK API Cheatsheet 与使用指南 (In-Context Learning) | 自动安装到 `.agent/skills` |
 
 > **Usage**: AI Agent 可直接调用这些脚本。例如：*"Run test generator on src/api.py"*
 
@@ -158,6 +160,7 @@ Vibe-CLI 采用 **线性流水线 (Linear Pipeline)** 架构，由四个角色�
 *   [x] **Preflight Checks**: 环境自检脚本.
 *   [x] **Multi-IDE Adapters**: 支持 Antigravity, Claude, Cursor 的原生规则生成.
 *   [x] **Project Skills**: 集成 doc-maintainer, lint-autofix 等自动化技能.
+*   [x] **Standardization**: 强制统一 LLM SDK (`my-llm-sdk`) 与 Plan-First 工作流.
 
 ---
 
