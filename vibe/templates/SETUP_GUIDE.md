@@ -30,7 +30,7 @@ Since the SDK is not yet on PyPI, install it directly from GitHub:
 
 ```bash
 # 1. Install my-llm-sdk
-pip install git+https://github.com/NoneSeniorEngineer/my-llm-sdk.git
+pip install my-llm-sdk
 
 # 2. Install other project dependencies
 # pip install -r requirements.txt

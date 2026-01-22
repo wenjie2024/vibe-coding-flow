@@ -12,7 +12,9 @@ Before writing any code or executing commands, you MUST:
         - Features/Versions: `plan_v1.0_Login.md`, `plan_v1.1_OAuth.md` ...
         - Iterative Updates: `plan_v1.11_Fix_Redirection.md` (for minor updates to v1.1)
     - **Content**: Include Goals, User Stories, Proposed Changes, and Verification steps.
-3.  **Act**: Execute the plan only AFTER the file is saved and the user (or your internal state) confirms.
+3.  **Act**: Execute the plan only AFTER the file is saved to the disk.
+    - **Self-Correction**: If you have generated a plan in chat but not saved it to `/plan/`, STOP and save it.
+    - **Verification**: Run `ls plan/` (orb equivalent) to confirm the file exists.
 4.  **Verify**: Run tests or verification commands after changes.
 
 ## Critical Instructions

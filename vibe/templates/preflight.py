@@ -78,7 +78,7 @@ def check_sdk_install():
         return True
     except ImportError:
         failure("my-llm-sdk not found!")
-        print("   👉 Tip: Run `pip install git+https://github.com/NoneSeniorEngineer/my-llm-sdk.git`")
+        print("   👉 Tip: Run `pip install my-llm-sdk`")
         return False
 
 def check_user_config():

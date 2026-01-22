@@ -28,7 +28,7 @@ def _ensure_llm_client():
             console.print("[bold red]Error:[/bold red] my_llm_sdk not found.")
             console.print(f"Import Error 1: {e1}")
             console.print(f"Import Error 2: {e2}")
-            console.print("Tip: Run `pip install git+https://github.com/wenjie2024/my-llm-sdk.git`")
+            console.print("Tip: Run `pip install my-llm-sdk`")
             sys.exit(1)
 
 

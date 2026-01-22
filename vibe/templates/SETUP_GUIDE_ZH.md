@@ -29,7 +29,7 @@ conda activate <your_conda_env>
 
 ```bash
 # 1. 安装 my-llm-sdk
-pip install git+https://github.com/wenjie2024/my-llm-sdk.git
+pip install my-llm-sdk
 
 # 2. 安装项目其他依赖
 # pip install -r requirements.txt
